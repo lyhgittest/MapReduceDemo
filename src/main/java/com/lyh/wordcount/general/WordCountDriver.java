@@ -1,40 +1,36 @@
-package com.lyh.wordcount.different;
-
-import java.io.IOException;
+package com.lyh.wordcount.general;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
-import org.apache.hadoop.mapreduce.lib.input.CombineTextInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+
 /**
- * 统计指定文件中的单词数，其中指定了combineTextInputFormat为输入类，用于合并多个小文件，优化小文件性能
+ * 使用默认的inputformat,普通的wordcount案例
+ * 
  * @author barry
  *
  */
 public class WordCountDriver {
 
-	public static void main(String[] args) throws IOException, ClassNotFoundException, InterruptedException {
-		args = new String[]{"D:/dp/test/combinetest","D:/dp/test/combinetestOut"};
+	public static void main(String[] args) throws Exception {
+		args = new String[]{"D:/dp/test/mapreduce/wordcountinput","D:/dp/test/mapreduce/wordcountoutput"};
 		// 1、获取配置文件创建job任务
 		Configuration conf = new Configuration();
 		// 注意：此处是通过get方法获取实例，不是new出来的。
 		Job job = Job.getInstance(conf);
-		//如果不设置InputFormatClass的话默认是TextInputFomat
-		job.setInputFormatClass(CombineTextInputFormat.class);
-		CombineTextInputFormat.setMaxInputSplitSize(job, 4194304);// 4m
-		CombineTextInputFormat.setMinInputSplitSize(job, 2097152);// 2m
+		// 如果不设置InputFormatClass的话默认是TextInputFomat
 
-		//job.setInputFormatClass(KeyValueTextInputFormat.class);
+		// job.setInputFormatClass(KeyValueTextInputFormat.class);
 		// 2、设置本地程序的jar包所在路径
 		job.setJarByClass(WordCountDriver.class);
 		// 3、设置mapper和reducer类
 		job.setMapperClass(WordCountMapper.class);
 		job.setReducerClass(WordCountReducer.class);
-		//job.setCombinerClass(WordCountReducer.class);
+		// job.setCombinerClass(WordCountReducer.class);
 		// 4、设置Mapper的输出类型
 		job.setMapOutputKeyClass(Text.class);
 		job.setMapOutputValueClass(IntWritable.class);
